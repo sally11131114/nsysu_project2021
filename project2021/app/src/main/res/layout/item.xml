@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <TextView
@@ -19,13 +19,5 @@
         android:text="Address: "
         android:textSize="20sp"
         android:layout_below="@id/item_tv1"
-        android:layout_marginLeft="15sp"/>
-    <TextView
-        android:id="@+id/item_tv3"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:text="Rssi: "
-        android:textSize="20sp"
-        android:layout_below="@id/item_tv2"
-        android:layout_marginLeft="15sp"/>
-</RelativeLayout>
+        android:layout_marginLeft="20sp"/>
+</LinearLayout>

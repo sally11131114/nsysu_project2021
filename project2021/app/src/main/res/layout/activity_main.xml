@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rl1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -9,33 +10,46 @@
 
     <TextView
         android:id="@+id/tv_topic"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:layout_width="match_parent"
-        android:text="Establish\nBluetooth Connection"
+        android:text="Bluetooth Connection"
         android:textColor="#000000"
         android:gravity="center"
         android:textSize="25sp"
         android:background="@drawable/drawable_topic"
         android:layout_margin="10dp" />
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp">
+            <Button
+                android:id="@+id/btn_on"
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:text="Turn on bluetooth"
+                android:background="@drawable/btn_on"
+                android:gravity="center"
+                android:onClick="TurnOn"
+                android:layout_weight="1"/>
 
-    <Button
-        android:id="@+id/btn_on"
-        android:layout_height="60dp"
-        android:layout_width="250dp"
-        android:text="Turn on bluetooth"
-        android:background="@drawable/btn_on"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="250dp" />
-    <Button
-        android:id="@+id/btn_discoverable"
-        android:layout_height="60dp"
-        android:layout_width="250dp"
-        android:text="make device discoverable"
-        android:background="@drawable/btn_on"
-        android:gravity="center"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/btn_on"
-        android:layout_marginTop="20dp" />
+            <Button
+                android:id="@+id/btn_scan"
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:text="scan devices\n(if turn on bluetooth)"
+                android:background="@drawable/btn_on"
+                android:gravity="center"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1.5"
+                android:onClick="StartScan"/>
+    </LinearLayout>
+    <ListView
+        android:id="@+id/lv"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
 
-</RelativeLayout>
+</LinearLayout>
