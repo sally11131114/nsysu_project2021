@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -65,15 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
         mBtn_On         = findViewById(R.id.btn_on);
         listView        = findViewById(R.id.lv);
-
-//        scannedDevices.add(new ScannedDevice("Sally", "1113", "hey"));
-//        scannedDevices.add(new ScannedDevice("A", "234", "happy"));
-//        scannedDevices.add(new ScannedDevice("B", "4566", "no"));
-//        scannedDevices.add(new ScannedDevice("Sally", "1113", "hey"));
-//        scannedDevices.add(new ScannedDevice("Sally", "1113", "hey"));
-//        scannedDevices.add(new ScannedDevice("Sally", "1113", "hey"));
-//        scannedDevices.add(new ScannedDevice("Sally", "1113", "hey"));
-//        scannedDevices.add(new ScannedDevice("Sally", "1113", "hey"));
         //initialization
         myAdapter = new MyAdapter(this, scannedDevices);
         listView.setAdapter(myAdapter);
@@ -81,10 +73,19 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
         }
-        final IntentFilter filter = new IntentFilter();
-        filter.addAction(BluetoothDevice.ACTION_FOUND);
-        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        registerReceiver(mReceiver, filter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("You touch the Nane=" + myAdapter.getItem(position).getName(), "Addr=" + myAdapter.getItem(position).getAddr());
+                if (mBlueAdapter.isDiscovering()){
+                    mBlueAdapter.cancelDiscovery();
+                }
+                Intent intent = new Intent(MainActivity.this, ConnectionActivity.class);
+                intent.putExtra("DeviceName", myAdapter.getItem(position).getName());
+                intent.putExtra("DeviceAddr", myAdapter.getItem(position).getAddr());
+                startActivity(intent);
+            }
+        });
     }
 
     public void TurnOn(View v) {
@@ -110,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
         scannedDevices.clear();
         //re-start discovery
         mBlueAdapter.startDiscovery();
+        final IntentFilter filter = new IntentFilter();
+        filter.addAction(BluetoothDevice.ACTION_FOUND);
+        filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        registerReceiver(mReceiver, filter);
         Toast.makeText(v.getContext(), "Start scan...", Toast.LENGTH_SHORT).show();
     }
 
@@ -151,6 +156,12 @@ public class MainActivity extends AppCompatActivity {
             myaddr.setText(current.getAddr());
 
             return item;
+        }
+
+        @Nullable
+        @Override
+        public ScannedDevice getItem(int position) {
+            return super.getItem(position);
         }
     }
 
