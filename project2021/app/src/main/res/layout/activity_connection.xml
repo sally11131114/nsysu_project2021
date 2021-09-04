@@ -48,4 +48,22 @@
             android:onClick="disconnect"/>
     </LinearLayout>
 
+<!--    <Button-->
+<!--        android:id="@+id/IR_transmit"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:text="transmit"-->
+<!--        android:background="@drawable/connection_start_stop"-->
+<!--        android:gravity="center"-->
+<!--        android:onClick="transmit"/>-->
+
+    <Button
+        android:id="@+id/IR_range"
+        android:layout_height="60dp"
+        android:layout_width="match_parent"
+        android:text="Check"
+        android:background="@drawable/connection_start_stop"
+        android:gravity="center"
+        android:onClick="check"/>
+
 </LinearLayout>

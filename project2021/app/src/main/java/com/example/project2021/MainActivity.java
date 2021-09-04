@@ -2,10 +2,18 @@ package com.example.project2021;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import java.net.*;
+import java.io.*;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
+
+import android.hardware.ConsumerIrManager;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -14,7 +22,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.hardware.ConsumerIrManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,6 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
     Button mBtn_On, mBtn_discover;
     private ListView listView;
+    public Socket s1;
+
+    private ConsumerIrManager mCIR;
 
     MyAdapter myAdapter;
     BluetoothAdapter mBlueAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -42,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.v("Hello", "broadcast");
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)){
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -59,8 +74,10 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -86,6 +103,22 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        mCIR = (ConsumerIrManager)this.getSystemService(Context.CONSUMER_IR_SERVICE);
+    }
+
+//    public void tcp_test(View view) {
+//        try {
+//            new ReceiveThread().start();
+//        } catch (Exception e) {
+//            Log.d("Client: ", "Bad!1");
+//            Log.e("Client: ", "Connect error "+e.getMessage());
+//            e.printStackTrace();
+//        }
+//    }
+
+    public void stream(View view) {
+        Intent intent = new Intent(MainActivity.this, StreamActivity.class);
+        startActivity(intent);
     }
 
     public void TurnOn(View v) {
@@ -134,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
     class MyAdapter extends ArrayAdapter<ScannedDevice> {
         MyAdapter (Context ct, ArrayList<ScannedDevice> scannedDevices){
@@ -189,5 +223,140 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(mReceiver);
+    }
+
+//    class ReceiveThread extends Thread {
+//
+//        private InputStream is;
+//        private FileOutputStream fout;
+//        private DataInputStream dis;
+//        private boolean isConnected;
+//
+//        public ReceiveThread() {
+//            isConnected = true;
+//        }
+//
+//        @Override
+//        public void run() {
+//            try {
+//                InetAddress serverIp = InetAddress.getByName("172.20.10.8");
+//                s1 = new Socket(serverIp, 10002);
+////                is=s1.getInputStream();
+////                fout=s1.getOutputStream();
+//                Log.d("Client: ", "start!");
+//            } catch (Exception e) {
+//                Log.d("Client: ", "Bad!2");
+//                Log.e("Client: ", "Connect error "+e.getMessage());
+//                e.printStackTrace();
+//            }
+////            dis = new DataInputStream(is);
+////            String temp = new String("hi");
+////            try {
+////                fout.write(temp.getBytes());
+////                fout.flush();
+////            } catch (IOException e) {
+////                e.printStackTrace();
+////            }
+//            String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test/";
+//            String state = Environment.getExternalStorageState();
+//            if (!state.equals(Environment.MEDIA_MOUNTED)) {
+//                Log.d("Client: ", "canot store !!!");
+//                return;
+//            }
+//            String filename = new String("image");
+//
+//            //require test filename ok test store image success or faile
+//            while (isConnected) {
+//                try {
+//                    if (fout == null) {
+//                        File file = new File(dir+filename+".jpg");
+//                        fout = new FileOutputStream(file);
+//                    }
+//                    is = s1.getInputStream();
+//                    dis = new DataInputStream(is);
+//                    byte[] buf = new byte[1024];
+//                    // int size = is.read(buf);
+//                    int size = 163575;
+//                    Log.d("Client: ", "size= "+ size);
+//                    int len = 0, count_bit = 0, r = size / 1024 + 1, i = 0;
+//                    while (true) {
+//                        for(long j=0;j<60000l;j++);
+//                        i++;
+//                        if (i == r) {
+//                            len = dis.read(buf, 0, size-count_bit);
+//                            Log.d("Client: ", "len= "+len);
+//                            fout.write(buf, 0, len);
+//                            break;
+//                        }
+//                        len = dis.read(buf, 0, 1024);
+//                        System.out.println("Client: " + len);
+//                        fout.write(buf, 0, len);
+//                        count_bit += len;
+//                        System.out.println(count_bit);
+//                    }
+//
+//                    isConnected = false;
+//
+//
+//                    if (fout != null) {
+//                        fout.close();
+//                    }
+//                    dis.close();
+//                    s1.close();
+//                } catch (IOException eIO) {
+//                    eIO.printStackTrace();
+//                }
+//
+//            }
+//
+//        }
+//
+//    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void transmit(View view) {
+        if (!mCIR.hasIrEmitter()) {
+            Toast.makeText(view.getContext(), "Can not find IR!!!!", Toast.LENGTH_SHORT).show();
+        }
+        else{
+            Toast.makeText(view.getContext(), "IR can use!!!!", Toast.LENGTH_SHORT).show();
+//            int[] pattern = {
+//                    //directing num
+//                    9000,4500,
+//
+//                    560,565, 560,565, 560,565, 560,1690,
+//                    560,565, 560,565, 560,565, 560,565,
+//                    560,565, 560,1690, 560,1690, 560,565,
+//                    560,565, 560,1690, 560,1690, 560,1690,
+//
+//                    560,1690, 560,565, 560,565, 560,565, 560,565, 560,565, 560,1690, 560,565,
+//
+//                    560,565, 560,1690, 560,1690, 560,1690, 560,1690, 560,1690, 560,565, 560,1690,
+//                    //end 2 number is ending
+//                    560,20000};
+            int[] pattern = {
+                    //directing num
+                    9000,4500,
+
+                    560,565, 560,565 ,560,1690, 560,1690, // 3
+                    //end 2 number is ending
+                    560,20000};
+            mCIR.transmit(38000, pattern);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void check(View view) {
+        StringBuilder b = new StringBuilder();
+        if (!mCIR.hasIrEmitter()) {
+            Toast.makeText(view.getContext(), "Can not find IR!!!!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ConsumerIrManager.CarrierFrequencyRange[] freqs = mCIR.getCarrierFrequencies();
+        b.append("IR Carrier Frequencies:\n");
+        for (ConsumerIrManager.CarrierFrequencyRange range : freqs) {
+            b.append(String.format("  %d - %d\n",range.getMinFrequency(), range.getMaxFrequency()));
+        }
+        Toast.makeText(view.getContext(), b.toString(), Toast.LENGTH_SHORT).show();
     }
 }
