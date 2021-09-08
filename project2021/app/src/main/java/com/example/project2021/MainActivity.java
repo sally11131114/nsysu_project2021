@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import java.net.*;
@@ -13,6 +14,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.hardware.ConsumerIrManager;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -33,6 +37,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -40,8 +45,11 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
+    private Set<BluetoothDevice> pairedDevices;
+    private ArrayAdapter<String> deviceName;  //定義陣列連接器字串的ID
 
     Button mBtn_On, mBtn_discover;
     private ListView listView;
@@ -77,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -135,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(v.getContext(), "Bluetooth is already on.", Toast.LENGTH_SHORT).show();
             }
         }
+
     }
 
     public void StartScan(View v) {
@@ -149,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(mReceiver, filter);
         Toast.makeText(v.getContext(), "Start scan...", Toast.LENGTH_SHORT).show();
+        Log.d("lt: ", "Start scan...");
+
     }
 
     @Override
@@ -167,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
     class MyAdapter extends ArrayAdapter<ScannedDevice> {
         MyAdapter (Context ct, ArrayList<ScannedDevice> scannedDevices){
@@ -319,6 +328,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(view.getContext(), "Can not find IR!!!!", Toast.LENGTH_SHORT).show();
         }
         else{
+            Log.d("hi", "  ir");
             Toast.makeText(view.getContext(), "IR can use!!!!", Toast.LENGTH_SHORT).show();
 //            int[] pattern = {
 //                    //directing num
@@ -336,12 +346,22 @@ public class MainActivity extends AppCompatActivity {
 //                    560,20000};
             int[] pattern = {
                     //directing num
-                    9000,4500,
-
-                    560,565, 560,565 ,560,1690, 560,1690, // 3
-                    //end 2 number is ending
-                    560,20000};
+                    1901, 4453, 625, 1614, 625, 1588, 625, 1614, 625,
+                    442, 625, 442, 625, 468, 625, 442, 625, 494, 572, 1614,
+                    625, 1588, 625, 1614, 625, 494, 572, 442, 651, 442, 625,
+                    442, 625, 442, 625, 1614, 625, 1588, 651, 1588, 625, 442,
+                    625, 494, 598, 442, 625, 442, 625, 520, 572, 442, 625, 442,
+                    625, 442, 651, 1588, 625, 1614, 625, 1588, 625, 1614, 625,
+                    1588, 625, 48958};
+//            int k=1000000/38000;
+//            for (int i = 0; i < pattern.length; i++){
+//                pattern[i] = pattern[i] / k;
+//            }
+//            for(int i =0;i<pattern.length;i++){
+//                Log.d("pattern["+i+"]", " "+pattern[i]);
+//            }
             mCIR.transmit(38000, pattern);
+            Log.d("can", "  ir");
         }
     }
 
@@ -358,5 +378,31 @@ public class MainActivity extends AppCompatActivity {
             b.append(String.format("  %d - %d\n",range.getMinFrequency(), range.getMaxFrequency()));
         }
         Toast.makeText(view.getContext(), b.toString(), Toast.LENGTH_SHORT).show();
+    }
+    //按下已配對按鈕後作動
+    public void test (View view)
+    {
+        //儲存藍芽設備名稱
+        deviceName = new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1);
+        //儲存藍芽設備
+        //取得和本機連接過的設備
+        pairedDevices = mBlueAdapter.getBondedDevices();
+        //清空陣列連接器字串
+        deviceName.clear();
+        //如果已配對設備>0
+        if (pairedDevices.size() > 0)
+        {
+            //將pairedDevice資料pass到Device
+            for (BluetoothDevice device : pairedDevices)
+            {
+                //從device取得資料後增加到deviceName內
+                Log.v("Nane=" + device.getName(), "Addr=" + device.getAddress());
+                scannedDevices.add(new ScannedDevice(device.getName(), device.getAddress()));
+                this.deviceName.add(device.getName()+"\n"+device.getAddress());
+            }
+            myAdapter.notifyDataSetChanged();
+        }
+        //利用listView顯示已配對藍芽設備
+        //listView.setAdapter(deviceName);
     }
 }

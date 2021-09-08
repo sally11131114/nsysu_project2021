@@ -10,19 +10,20 @@ import android.widget.MediaController;
 import android.widget.VideoView;
 
 public class StreamActivity extends AppCompatActivity {
-
+    String web;
     VideoView stream;
     Button ss;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stream);
+        web=getIntent().getStringExtra("web");
         stream = (VideoView)findViewById(R.id.vv);
         ss     = (Button) findViewById(R.id.start_stream);
     }
 
     public void starts(View view) {
-        String path ="rtsp://172.20.10.6:8554/unicast";
+        String path =web;
         Uri uri = Uri.parse(path);
         stream.setMediaController(new MediaController(this));
         stream.setVideoURI(uri);

@@ -65,5 +65,13 @@
         android:background="@drawable/connection_start_stop"
         android:gravity="center"
         android:onClick="check"/>
+    <Button
+        android:id="@+id/send_router"
+        android:layout_height="60dp"
+        android:layout_width="match_parent"
+        android:text="send name pass"
+        android:background="@drawable/connection_start_stop"
+        android:gravity="center"
+        android:onClick="send_router" />
 
 </LinearLayout>
