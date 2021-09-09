@@ -19,6 +19,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import java.util.UUID;
+import javax.crypto.Cipher;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
@@ -37,7 +52,11 @@ public class ConnectionActivity extends AppCompatActivity implements ExampleDial
     TextView tv1;
     String ir_recv;
     String Router_name, Router_pass;
-
+    private String iot_public_key_string;
+    private String my_public_key_string, my_private_key_string;
+    private RSAPublicKey iot_public_key;
+    private RSAPublicKey my_public_key;
+    private RSAPrivateKey my_private_key;
 
     private Thread ConnectedThread = new Thread(new Runnable(){
         public void run(){
@@ -68,7 +87,6 @@ public class ConnectionActivity extends AppCompatActivity implements ExampleDial
         device_addr=getIntent().getStringExtra("DeviceAddr");
         tv1.setText("Device: " + device_name + "\n\t" + device_addr);
         mCIR = (ConsumerIrManager)this.getSystemService(Context.CONSUMER_IR_SERVICE);
-
    }
 
     @Override
@@ -77,7 +95,6 @@ public class ConnectionActivity extends AppCompatActivity implements ExampleDial
         Router_pass = password;
         Log.v("ID:"+Router_name, " PASS:"+Router_pass);
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void connect(View view) throws IOException {
@@ -107,23 +124,25 @@ public class ConnectionActivity extends AppCompatActivity implements ExampleDial
         }
         ConnectedThread.start();
 
-        communication_beforeIR();
-
-        int IR_check = transmit();
-        if(IR_check==0){
-            Log.v("IR_check", "failed");
-            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            communication_beforeIR();
         }
-        Log.v("IR_check", "successful");
-
-        ExampleDialog Dialog = new ExampleDialog();
-        Dialog.show(getSupportFragmentManager(), "example dialog");
-        String web = communication_afterIR();
-
-
-        Intent intent = new Intent(ConnectionActivity.this, StreamActivity.class);
-        intent.putExtra("web", web);
-        startActivity(intent);
+//
+//        int IR_check = transmit();
+//        if(IR_check==0){
+//            Log.v("IR_check", "failed");
+//            return;
+//        }
+//        Log.v("IR_check", "successful");
+//
+//        ExampleDialog Dialog = new ExampleDialog();
+//        Dialog.show(getSupportFragmentManager(), "example dialog");
+//        String web = communication_afterIR();
+//
+//
+//        Intent intent = new Intent(ConnectionActivity.this, StreamActivity.class);
+//        intent.putExtra("web", web);
+//        startActivity(intent);
     }
 
     public void disconnect(View view) {
@@ -141,6 +160,7 @@ public class ConnectionActivity extends AppCompatActivity implements ExampleDial
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void communication_beforeIR(){
         byte[] buffer = new byte[2048];
         int count;
@@ -149,19 +169,32 @@ public class ConnectionActivity extends AppCompatActivity implements ExampleDial
         send(temp_send);
         Log.d(TAG, "Send the message"+temp_send);
 
-//        try {
-//            count = mInputstream.read(buffer);
-//            String temp = new String(buffer, 0, count);
-//            Log.d(TAG, "InputStream:" + temp);
-//
-//        } catch (IOException e) {
-//            Log.e(TAG, "Error inputstream. " + e.getMessage());
-//        }
+        try {
+            count = mInputstream.read(buffer);
+            String temp = new String(buffer, 0, count);
+            Log.d(TAG, "InputStream:" + temp);
+
+        } catch (IOException e) {
+            Log.e(TAG, "Error inputstream. " + e.getMessage());
+        }
         //for ACK
 
         String temp2_send = new String("HTC HTC One");
         send(temp2_send);
         Log.d(TAG, "Send the message"+temp2_send);
+
+
+        try {
+            count = mInputstream.read(buffer);
+            String temp = new String(buffer, 0, count);
+            iot_public_key_string= temp;
+            Log.d(TAG, "InputStream:" + temp);
+        } catch (IOException e) {
+            Log.e(TAG, "Error inputstream. " + e.getMessage());
+        }
+        //receive iot public key
+
+        send_key();
 
 //        try {
 //            count = mInputstream.read(buffer);
@@ -173,6 +206,37 @@ public class ConnectionActivity extends AppCompatActivity implements ExampleDial
 //            Log.e(TAG, "Error inputstrea " + e.getMessage());
 //        }
         //for ACK
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void send_key(){
+        try{
+            //turn iot_key_string into publickey
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA"); //NoSuchAlgorithmException
+            Base64.Decoder iot_decoder = Base64.getDecoder();
+            byte[] keyBytes = iot_decoder.decode(iot_public_key_string);
+            X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyBytes);
+            iot_public_key = (RSAPublicKey)keyFactory.generatePublic(x509EncodedKeySpec); //InvalidKeySepcException
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //creat my key
+        KeyPairGenerator keyPairGenerator = null;
+        try {
+            keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        keyPairGenerator.initialize(1024);
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        my_public_key = (RSAPublicKey)keyPair.getPublic();
+        my_private_key = (RSAPrivateKey)keyPair.getPrivate();
+        Base64.Encoder my_encoder = Base64.getEncoder();
+        my_public_key_string = my_encoder.encodeToString(my_public_key.getEncoded());
+        send(my_public_key_string);
+        Log.d(TAG, "Send the message"+my_public_key_string);
 
     }
 
