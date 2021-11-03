@@ -28,24 +28,24 @@
         <Button
             android:id="@+id/btn_connect"
             android:layout_height="match_parent"
-            android:layout_width="100dp"
-            android:text="Connect"
+            android:layout_width="500dp"
+            android:text="Connect and IR verify"
             android:background="@drawable/connection_start_stop"
             android:gravity="center"
             android:onClick="connect"
             android:layout_weight="1"/>
 
-        <Button
-            android:id="@+id/btn_disconnect"
-            android:layout_height="match_parent"
-            android:layout_width="120dp"
-            android:text="disconnect"
-            android:background="@drawable/connection_start_stop"
-            android:gravity="center"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="1.5"
-            android:onClick="disconnect"/>
+<!--        <Button-->
+<!--            android:id="@+id/btn_disconnect"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_width="120dp"-->
+<!--            android:text="disconnect"-->
+<!--            android:background="@drawable/connection_start_stop"-->
+<!--            android:gravity="center"-->
+<!--            android:layout_gravity="center_horizontal"-->
+<!--            android:layout_marginLeft="10dp"-->
+<!--            android:layout_weight="1.5"-->
+<!--            android:onClick="disconnect"/>-->
     </LinearLayout>
 
 <!--    <Button-->
@@ -58,20 +58,21 @@
 <!--        android:onClick="transmit"/>-->
 
     <Button
-        android:id="@+id/IR_range"
+        android:id="@+id/stream"
         android:layout_height="60dp"
         android:layout_width="match_parent"
-        android:text="Check"
+        android:text="start to use iot"
         android:background="@drawable/connection_start_stop"
         android:gravity="center"
-        android:onClick="check"/>
-    <Button
-        android:id="@+id/send_router"
-        android:layout_height="60dp"
-        android:layout_width="match_parent"
-        android:text="send name pass"
-        android:background="@drawable/connection_start_stop"
-        android:gravity="center"
-        android:onClick="send_router" />
+        android:onClick="set_stream" />
 
+    <TextView
+        android:id="@+id/phase"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="State:\nSTAY"
+        android:textColor="#000000"
+        android:textSize="25sp" />
 </LinearLayout>

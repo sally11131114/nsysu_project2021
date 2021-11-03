@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ToolsActivity"
+    android:orientation="vertical"
+    android:layout_marginLeft="100dp"
+    android:layout_marginTop="230dp">
+<!--    <Button-->
+<!--        android:id="@+id/start_stream"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:text="start stream"-->
+<!--        android:background="@drawable/connection_start_stop"-->
+<!--        android:gravity="center"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:onClick="start_stream"/>-->
+<!--    <Button-->
+<!--        android:id="@+id/add_tenant"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:text="add tenant"-->
+<!--        android:background="@drawable/connection_start_stop"-->
+<!--        android:gravity="center"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:onClick="add_"/>-->
+<!--    <EditText-->
+<!--        android:id="@+id/request"-->
+<!--        android:layout_width="410dp"-->
+<!--        android:layout_height="wrap_content" />-->
+<!--        <Button-->
+<!--            android:id="@+id/btn_check"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_width="100dp"-->
+<!--            android:text="check"-->
+<!--            android:background="@drawable/connection_start_stop"-->
+<!--            android:gravity="center"-->
+<!--            android:layout_marginTop="20dp"-->
+<!--            android:onClick="add_"/>-->
+    <Button
+        android:id="@+id/addt"
+        android:layout_height="50dp"
+        android:layout_width="100dp"
+        android:text="add"
+        android:layout_marginLeft="50dp"
+        android:background="@drawable/connection_start_stop"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:visibility="invisible"/>
+    <Button
+        android:id="@+id/commands"
+        android:layout_height="50dp"
+        android:layout_width="100dp"
+        android:text="get video"
+        android:layout_marginLeft="50dp"
+        android:background="@drawable/connection_start_stop"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+      android:visibility="invisible"/>
+    <Button
+        android:id="@+id/login"
+        android:layout_height="50dp"
+        android:layout_width="100dp"
+        android:text="login"
+        android:layout_marginLeft="50dp"
+        android:background="@drawable/connection_start_stop"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:visibility="invisible"
+        android:onClick="login"/>
+
+
+
+</LinearLayout>

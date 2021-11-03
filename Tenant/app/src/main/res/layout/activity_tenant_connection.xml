@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TenantConnectionActivity"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/device"
+        android:layout_height="100dp"
+        android:layout_width="match_parent"
+        android:text="Device Name: "
+        android:textColor="#000000"
+        android:gravity="center"
+        android:textSize="25sp"
+        android:background="@drawable/connection_title"
+        android:layout_margin="10dp"
+        />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp">
+        <Button
+            android:id="@+id/btn_connect"
+            android:layout_height="match_parent"
+            android:layout_width="200dp"
+            android:text="Connect"
+            android:background="@drawable/connection_start_stop"
+            android:gravity="center"
+            android:onClick="connect"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+    <Button
+        android:id="@+id/stream"
+        android:layout_height="60dp"
+        android:layout_width="match_parent"
+        android:text="start to use iot"
+        android:background="@drawable/connection_start_stop"
+        android:gravity="center"
+        android:onClick="set_stream" />
+    <TextView
+        android:id="@+id/phase"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="State:\nSTAY"
+        android:textColor="#000000"
+        android:textSize="25sp" />
+
+</LinearLayout>

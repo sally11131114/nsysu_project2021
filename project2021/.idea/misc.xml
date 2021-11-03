@@ -4,9 +4,14 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../layout/custom_preview.xml" value="0.18645833333333334" />
+        <entry key="app/src/main/res/drawable/btn_on.xml" value="0.371875" />
+        <entry key="app/src/main/res/drawable/connection_start_stop.xml" value="0.371875" />
+        <entry key="app/src/main/res/drawable/connection_title.xml" value="0.16018518518518518" />
+        <entry key="app/src/main/res/drawable/drawable_topic.xml" value="0.371875" />
         <entry key="app/src/main/res/layout/activity_connection.xml" value="0.17552083333333332" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.2513586956521739" />
-        <entry key="app/src/main/res/layout/activity_stream.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_stream.xml" value="0.1925925925925926" />
+        <entry key="app/src/main/res/layout/activity_tools.xml" value="0.35572916666666665" />
         <entry key="app/src/main/res/layout/dialog_e.xml" value="0.35572916666666665" />
         <entry key="app/src/main/res/layout/item.xml" value="0.26132246376811596" />
       </map>

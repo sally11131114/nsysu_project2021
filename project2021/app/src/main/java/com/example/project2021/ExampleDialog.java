@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 
 public class ExampleDialog extends AppCompatDialogFragment {
@@ -37,7 +38,11 @@ public class ExampleDialog extends AppCompatDialogFragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         String username = editTextUsername.getText().toString();
                         String password = editTextPassword.getText().toString();
-                        listener.applyTexts(username, password);
+                        try {
+                            listener.applyTexts(username, password);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
 
@@ -60,6 +65,6 @@ public class ExampleDialog extends AppCompatDialogFragment {
     }
 
     public interface ExampleDialogListener {
-        void applyTexts(String username, String password);
+        void applyTexts(String username, String password) throws InterruptedException;
     }
 }

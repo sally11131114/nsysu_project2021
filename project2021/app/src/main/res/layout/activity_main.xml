@@ -45,33 +45,16 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1.5"
-                android:onClick="StartScan"/>
+                android:onClick="test"/>
     </LinearLayout>
-        <Button
-            android:id="@+id/start_stream"
-            android:layout_height="60dp"
-            android:layout_width="match_parent"
-            android:text="stream"
-            android:background="@drawable/connection_start_stop"
-            android:gravity="center"
-            android:onClick="stream"/>
-    <Button
-        android:id="@+id/IR_transmit"
-        android:layout_height="60dp"
-        android:layout_width="match_parent"
-        android:text="transmit"
-        android:background="@drawable/connection_start_stop"
-        android:gravity="center"
-        android:onClick="transmit"/>
-    <Button
-        android:id="@+id/test"
-        android:layout_height="60dp"
-        android:layout_width="match_parent"
-        android:text="test"
-        android:background="@drawable/connection_start_stop"
-        android:gravity="center"
-        android:onClick="test"/>
-
+<!--    <Button-->
+<!--        android:id="@+id/IR_transmit"-->
+<!--        android:layout_height="60dp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:text="transmit"-->
+<!--        android:background="@drawable/connection_start_stop"-->
+<!--        android:gravity="center"-->
+<!--        android:onClick="transmit"/>-->
 <!--    <Button-->
 <!--        android:id="@+id/IR_range"-->
 <!--        android:layout_height="60dp"-->

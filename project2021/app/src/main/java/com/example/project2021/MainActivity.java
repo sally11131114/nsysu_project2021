@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import java.net.*;
@@ -14,6 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -47,15 +47,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     private Set<BluetoothDevice> pairedDevices;
     private ArrayAdapter<String> deviceName;  //定義陣列連接器字串的ID
-
+    public String TAG = "main login";
     Button mBtn_On, mBtn_discover;
     private ListView listView;
     public Socket s1;
-
+    GlobalVariable login_socket;
+    public Socket server_socket;
     private ConsumerIrManager mCIR;
+    String owner_ID, owner_pass;
+    private InputStream is;
+    private OutputStream out;
 
     MyAdapter myAdapter;
     BluetoothAdapter mBlueAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -88,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        owner_ID="phone_owner";
+        owner_pass="123456";
         mBtn_On         = findViewById(R.id.btn_on);
         listView        = findViewById(R.id.lv);
         //initialization
@@ -107,12 +113,13 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, ConnectionActivity.class);
                 intent.putExtra("DeviceName", myAdapter.getItem(position).getName());
                 intent.putExtra("DeviceAddr", myAdapter.getItem(position).getAddr());
+                intent.putExtra("owner_ID", owner_ID);
+                intent.putExtra("owner_pass", owner_pass);
                 startActivity(intent);
             }
         });
         mCIR = (ConsumerIrManager)this.getSystemService(Context.CONSUMER_IR_SERVICE);
     }
-
 //    public void tcp_test(View view) {
 //        try {
 //            new ReceiveThread().start();
@@ -123,10 +130,6 @@ public class MainActivity extends AppCompatActivity {
 //        }
 //    }
 
-    public void stream(View view) {
-        Intent intent = new Intent(MainActivity.this, StreamActivity.class);
-        startActivity(intent);
-    }
 
     public void TurnOn(View v) {
         if(mBlueAdapter == null ){
@@ -140,6 +143,16 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 Toast.makeText(v.getContext(), "Bluetooth is already on.", Toast.LENGTH_SHORT).show();
+                //////tcp server
+                try {
+                    new ReceiveThread().start();
+                } catch (Exception e) {
+                    Log.d("Client: ", " Bad!");
+                    Log.e("Client: ", " Server Connect error "+e.getMessage());
+                    e.printStackTrace();
+                }
+                Toast.makeText(this, "Server tcp successful", Toast.LENGTH_SHORT).show();
+                //////tcp server
             }
         }
 
@@ -234,175 +247,117 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(mReceiver);
     }
 
-//    class ReceiveThread extends Thread {
-//
-//        private InputStream is;
-//        private FileOutputStream fout;
-//        private DataInputStream dis;
-//        private boolean isConnected;
-//
-//        public ReceiveThread() {
-//            isConnected = true;
-//        }
-//
-//        @Override
-//        public void run() {
-//            try {
-//                InetAddress serverIp = InetAddress.getByName("172.20.10.8");
-//                s1 = new Socket(serverIp, 10002);
-////                is=s1.getInputStream();
-////                fout=s1.getOutputStream();
-//                Log.d("Client: ", "start!");
-//            } catch (Exception e) {
-//                Log.d("Client: ", "Bad!2");
-//                Log.e("Client: ", "Connect error "+e.getMessage());
-//                e.printStackTrace();
-//            }
-////            dis = new DataInputStream(is);
-////            String temp = new String("hi");
-////            try {
-////                fout.write(temp.getBytes());
-////                fout.flush();
-////            } catch (IOException e) {
-////                e.printStackTrace();
-////            }
-//            String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test/";
-//            String state = Environment.getExternalStorageState();
-//            if (!state.equals(Environment.MEDIA_MOUNTED)) {
-//                Log.d("Client: ", "canot store !!!");
-//                return;
-//            }
-//            String filename = new String("image");
-//
-//            //require test filename ok test store image success or faile
-//            while (isConnected) {
-//                try {
-//                    if (fout == null) {
-//                        File file = new File(dir+filename+".jpg");
-//                        fout = new FileOutputStream(file);
-//                    }
-//                    is = s1.getInputStream();
-//                    dis = new DataInputStream(is);
-//                    byte[] buf = new byte[1024];
-//                    // int size = is.read(buf);
-//                    int size = 163575;
-//                    Log.d("Client: ", "size= "+ size);
-//                    int len = 0, count_bit = 0, r = size / 1024 + 1, i = 0;
-//                    while (true) {
-//                        for(long j=0;j<60000l;j++);
-//                        i++;
-//                        if (i == r) {
-//                            len = dis.read(buf, 0, size-count_bit);
-//                            Log.d("Client: ", "len= "+len);
-//                            fout.write(buf, 0, len);
-//                            break;
-//                        }
-//                        len = dis.read(buf, 0, 1024);
-//                        System.out.println("Client: " + len);
-//                        fout.write(buf, 0, len);
-//                        count_bit += len;
-//                        System.out.println(count_bit);
-//                    }
-//
-//                    isConnected = false;
-//
-//
-//                    if (fout != null) {
-//                        fout.close();
-//                    }
-//                    dis.close();
-//                    s1.close();
-//                } catch (IOException eIO) {
-//                    eIO.printStackTrace();
-//                }
-//
-//            }
-//
-//        }
-//
-//    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void transmit(View view) {
-        if (!mCIR.hasIrEmitter()) {
-            Toast.makeText(view.getContext(), "Can not find IR!!!!", Toast.LENGTH_SHORT).show();
-        }
-        else{
-            Log.d("hi", "  ir");
-            Toast.makeText(view.getContext(), "IR can use!!!!", Toast.LENGTH_SHORT).show();
-//            int[] pattern = {
-//                    //directing num
-//                    9000,4500,
-//
-//                    560,565, 560,565, 560,565, 560,1690,
-//                    560,565, 560,565, 560,565, 560,565,
-//                    560,565, 560,1690, 560,1690, 560,565,
-//                    560,565, 560,1690, 560,1690, 560,1690,
-//
-//                    560,1690, 560,565, 560,565, 560,565, 560,565, 560,565, 560,1690, 560,565,
-//
-//                    560,565, 560,1690, 560,1690, 560,1690, 560,1690, 560,1690, 560,565, 560,1690,
-//                    //end 2 number is ending
-//                    560,20000};
-            int[] pattern = {
-                    //directing num
-                    1901, 4453, 625, 1614, 625, 1588, 625, 1614, 625,
-                    442, 625, 442, 625, 468, 625, 442, 625, 494, 572, 1614,
-                    625, 1588, 625, 1614, 625, 494, 572, 442, 651, 442, 625,
-                    442, 625, 442, 625, 1614, 625, 1588, 651, 1588, 625, 442,
-                    625, 494, 598, 442, 625, 442, 625, 520, 572, 442, 625, 442,
-                    625, 442, 651, 1588, 625, 1614, 625, 1588, 625, 1614, 625,
-                    1588, 625, 48958};
-//            int k=1000000/38000;
-//            for (int i = 0; i < pattern.length; i++){
-//                pattern[i] = pattern[i] / k;
-//            }
-//            for(int i =0;i<pattern.length;i++){
-//                Log.d("pattern["+i+"]", " "+pattern[i]);
-//            }
-            mCIR.transmit(38000, pattern);
-            Log.d("can", "  ir");
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void check(View view) {
-        StringBuilder b = new StringBuilder();
-        if (!mCIR.hasIrEmitter()) {
-            Toast.makeText(view.getContext(), "Can not find IR!!!!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        ConsumerIrManager.CarrierFrequencyRange[] freqs = mCIR.getCarrierFrequencies();
-        b.append("IR Carrier Frequencies:\n");
-        for (ConsumerIrManager.CarrierFrequencyRange range : freqs) {
-            b.append(String.format("  %d - %d\n",range.getMinFrequency(), range.getMaxFrequency()));
-        }
-        Toast.makeText(view.getContext(), b.toString(), Toast.LENGTH_SHORT).show();
-    }
-    //按下已配對按鈕後作動
     public void test (View view)
     {
-        //儲存藍芽設備名稱
         deviceName = new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1);
-        //儲存藍芽設備
-        //取得和本機連接過的設備
         pairedDevices = mBlueAdapter.getBondedDevices();
-        //清空陣列連接器字串
         deviceName.clear();
-        //如果已配對設備>0
         if (pairedDevices.size() > 0)
         {
-            //將pairedDevice資料pass到Device
             for (BluetoothDevice device : pairedDevices)
             {
-                //從device取得資料後增加到deviceName內
                 Log.v("Nane=" + device.getName(), "Addr=" + device.getAddress());
                 scannedDevices.add(new ScannedDevice(device.getName(), device.getAddress()));
                 this.deviceName.add(device.getName()+"\n"+device.getAddress());
             }
             myAdapter.notifyDataSetChanged();
         }
-        //利用listView顯示已配對藍芽設備
-        //listView.setAdapter(deviceName);
+    }
+
+    public void send2(String output){
+        if(output == null){
+            return;
+        }
+        try{
+            out.write(output.getBytes());
+            out.flush();
+            Log.d(TAG, "Outputstream: "+output);
+        }catch (IOException e){
+            Log.e(TAG, "Send error."+e.getMessage());
+        }
+    }
+
+    public String recv2(){
+        String s = null;
+        byte[] buffer = new byte[2048];
+        int count;
+        try {
+            count = is.read(buffer);
+            String temp = new String(buffer, 0, count);
+            s=temp;
+            Log.d(TAG, "==========InputStream:" + temp);
+        } catch (IOException e) {
+            Log.e(TAG, "==========Error inputstream. " + e.getMessage());
+        }
+        return s;
+    }
+    class ReceiveThread extends Thread {
+
+        private boolean isConnected;
+        private String command_name;
+        private int test;
+
+        public ReceiveThread() {
+            is = null;
+            out = null;
+            isConnected = true;
+            command_name = null;
+            test = 0;
+        }
+
+        @SuppressLint("LongLogTag")
+        @Override
+        public void run() {
+            try {
+                InetAddress serverIp = InetAddress.getByName("192.168.0.115");
+                server_socket = new Socket(serverIp, 9994);
+                is=server_socket.getInputStream();
+                out=server_socket.getOutputStream();
+                Log.d("==========Client for server: ", "start!");
+            } catch (Exception e) {
+                Log.d("==========Client for server: ", "Bad!");
+                Log.e("==========Client for server: ", "Connect error "+e.getMessage());
+                e.printStackTrace();
+            }
+
+            owner_ID="phone_owner";
+            owner_pass="123456";
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            recv2();
+            send2("ACK");
+            recv2();
+//          for ACK
+
+            String send_server = "owner";
+            send2(send_server);
+
+            recv2();
+            send2("1");
+
+            //send my ID pass
+            recv2();
+            send2(owner_ID);
+            recv2();
+            send2(owner_pass);
+            recv2();
+            //start use
+            Log.d("server: success", "good!");
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+//            try {
+//                server_socket.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+
+        }
+
     }
 }
